@@ -1,0 +1,23 @@
+{
+  "name": "shavian-translator",
+  "description": "web app that translates English to the (fictional) Shavian language.",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thomasrstorey/shavian-translator.git"
+  },
+  "dependencies": {
+    "crypto-js": "3.1.2",
+    "body-parser": "~1.0.0",
+    "bson": "^0.2.17",
+    "cookie-parser": "~1.0.1",
+    "debug": "~0.7.4",
+    "express": "~4.5.1",
+    "express-session": "^1.9.3",
+    "hbs": "^2.8.0",
+    "method-override": "^2.3.1",
+    "morgan": "~1.0.0",
+    "socket.io": "^1.3.2",
+    "lodash": "3.2.0"
+  }
+}

@@ -48,7 +48,7 @@ hbs.registerPartials('./public/views/partials/');
 
 // routes =======================================================
 
-require('./app/routes.js')(app, passport, now); //load routes
+require('./app/routes.js')(app); //load routes
 
 // run ==========================================================
 

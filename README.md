@@ -1,5 +1,5 @@
-# shavian-translator
-Web app to translate from English to the (fictional) Shavian language.
+# shalish-translator
+Web app to translate from English to the (fictional) SHAlish language.
 
 ## Overview
 

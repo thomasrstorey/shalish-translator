@@ -44,7 +44,20 @@ hbs.registerPartials('./public/views/partials/');
 
 // socket.io ====================================================
 
-
+io.on('connection', function (socket) {
+	console.log("a user connected");
+	socket.on('disconnect', function () {
+		console.log("a user disconnected")
+	});
+	socket.on('change', function (string) {
+		//tokenize string
+		//for each token
+			//if available, get translation from json
+			//else make new translation
+			//add translation to output string
+		//emit 'translation' event with output string
+	})
+}
 
 // routes =======================================================
 

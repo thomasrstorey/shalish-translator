@@ -49,9 +49,29 @@ hbs.registerPartials('./public/views/partials/');
 
 // socket.io ====================================================
 
-var makeTx = function (word) {
-	var hash = SHA256(word);
-
+var makeTx = function (string) {
+	var hash = SHA256(string);
+	var chunks = _.chunk(hash.toString(), 8);
+	//convert chunk arrays to hex formatted strings
+	var hexints = _.map(chunks, function (arr) { 
+			return _.reduce(arr, function (o, c, n) {
+			 	if(n == 1) { 
+			 		return '0x' + o + c; 
+			 	} 
+			 	return o + c; 
+			 }); 
+		});
+	//convert hex formatted strings to a word
+	var word = _(_.map(hexints, function (hs) {
+	 return String.fromCharCode((parseInt(hs)%26)+97); 
+	})).reduce( function (o, c, n) {
+	 	if(n < string.length) {
+	  		return o + c; 
+		} else {
+			return o;
+		} 
+	});
+	return word;
 }
 
 var saveNewTxs = function (input, output, dict) {
@@ -65,7 +85,7 @@ io.on('connection', function (socket) {
 	});
 	socket.on('change', function (string) {
 		//tokenize string
-		var tokens = _.words( string, /[^, ]+/g );
+		var tokens = _.words( string, /[\w-]+/g );
 		//for each token
 		var txs = [];
 		for(var i = 0; i != tokens.length; i++){

@@ -13,9 +13,11 @@ var hbs    					= require('hbs');
 var io 						= require('socket.io')(http);
 var _ 						= require('lodash');
 var fs 						= require('fs');
-var SHA256 					= require("crypto-js/sha256");
+var SHA256 					= require('crypto-js/sha256');
+
 
 // configuration ==============================================
+var config = require('./config/config.js');
 
 app.use(cookieParser()); //use cookies for auth
 app.use(bodyParser()); //parse html forms
@@ -39,7 +41,7 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/public/views');
 
 
-var dict = JSON.parse( fs.readFileSync('./app/dict.json', 'utf8') );
+var dict = JSON.parse( fs.readFileSync(config.dictFilePath, 'utf8') );
 
 // handlebars ===================================================
 
@@ -72,38 +74,45 @@ var makeTx = function (string) {
 		} 
 	});
 	return word;
-}
-
-var saveNewTxs = function (input, output, dict) {
-
-}
+};
 
 io.on('connection', function (socket) {
 	console.log("a user connected");
+	
 	socket.on('disconnect', function () {
 		console.log("a user disconnected")
 	});
+	
 	socket.on('change', function (string) {
 		//tokenize string
-		var tokens = _.words( string, /[\w-]+/g );
+		var tokens = _.words( string );
 		//for each token
 		var txs = [];
 		for(var i = 0; i != tokens.length; i++){
-			//if available, get translation from json
-			if( _.has(dict, tokens[i]) ){
-				txs[i] = dict[tokens[i]];
-			} else {
-				//else make new translation
-				txs[i] = makeTx(tokens[i]);
+			//if available, get translation from json, else make a new translation
+			if( !_.has(dict, tokens[i]) ){
+				dict[tokens[i]] = makeTx(tokens[i]);	
 			}
+			console.log(dict[tokens[i]]);
+			txs[i] = dict[tokens[i]]; 
 		}
+		//write updated dictionary to json
+		var jsonDict = JSON.stringify(dict);
+		fs.writeFile(config.dictFilePath, jsonDict, function (err) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log("updated dictionary");
+			}
+		});
 		//add translation to output string
 		var tx = _.reduce(txs, function (output, word) { return output + " " + word; });
-				
+			
 		//emit 'translation' event with output string
-		socket.emit('tx' tx);
+		socket.emit('tx', tx);
 	});
-}
+
+});
 
 // routes =======================================================
 

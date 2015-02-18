@@ -26,19 +26,49 @@
 		<!-- ###### socket.io setup ####### -->
 		<script src="https://cdn.socket.io/socket.io-1.3.2.js"></script>
 		<script>
+		var Translator = function () {
+			var that = {};
 			var socket = io();
-			socket.on('translation', function (string) {
-				//replace inner html of output textarea with string
-			});
-			window.onload = function () {
-				var input = document.getElementById("input");
-				var translate = function () {
-					//wait 1 second
+			var input = document.getElementById("input");
+			var output = document.getElementById("output");
+			var arrow = document.getElementById("arrow");
+			var arrowDown = document.getElementById("arrow-down");
+			var tid;
+
+			var init = function () {
+				socket.on('tx', function (string) {
+					//replace inner html of output textarea with string
+					output.value = string;
+				});
+			}
+			
+			var translate = function () {
+				window.clearTimeout(tid);
+				//wait 1 second
+				tid = window.setTimeout(function () {
 					//emit 'change' socket event with current string in input
-				};
-				input.onkeyup = translate;
-				input.onchange = translate;
-			});
+					var string = input.value;
+					console.log(string);
+					socket.emit('change', string);
+				}, 1000);		
+			};
+
+			that.init = init;
+			that.translate = translate;
+
+			return that;
+		};
+
+		window.onload = function () {
+			var translator = new Translator();
+			translator.init();
+			//listen to interaction events to trigger translation
+			input.onkeyup = translator.translate;
+			input.onchange = translator.translate;
+			arrow.onclick = translator.translate;
+			arrowDown.onclick = translator.translate;
+		};
+			
 		</script>
 
 	</body>
